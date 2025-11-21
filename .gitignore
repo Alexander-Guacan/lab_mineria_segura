@@ -1,0 +1,46 @@
+# --- ENTORNOS PYTHON ---
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# --- CONFIGURACIONES DEL EDITOR ---
+.vscode/
+.idea/
+*.swp
+
+# --- NOTEBOOKS ---
+.ipynb_checkpoints/
+
+# --- ARCHIVOS DE LOG ---
+*.log
+
+# --- DATASETS Y ARCHIVOS PESADOS ---
+data/raw/
+data/commits/
+data/meta/dataset_raw.csv
+data/meta/dataset_features.csv
+data/temp/
+*.csv
+*.json
+*.pickle
+*.pkl
+*.db
+
+# --- ARCHIVOS DEL PIPELINE ---
+reports/
+outputs/
+
+# --- ARCHIVOS DEL SISTEMA ---
+.DS_Store
+Thumbs.db
+
+# --- ENTORNOS Y PAQUETES ---
+*.egg-info/
+dist/
+build/
