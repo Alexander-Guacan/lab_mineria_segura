@@ -92,6 +92,10 @@ tqdm
  ```bash
  python src/download_sample.py
  ```
+
+ ```bash
+ python src/extract_features.py
+ ```
 6. Verificar datasets generados en:
 data/meta/
 
