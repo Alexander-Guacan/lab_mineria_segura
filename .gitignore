@@ -29,7 +29,6 @@ data/temp/
 *.csv
 *.json
 *.pickle
-*.pkl
 *.db
 
 # --- ARCHIVOS DEL PIPELINE ---
