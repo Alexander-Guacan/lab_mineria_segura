@@ -24,7 +24,7 @@ jobs:
 
       - name: Run code risk analysis
         run: |
-          python src/analyze_repo.py src
+          python src/analyze_repo.py tests
 
       - name: Validate results (fail on high risk)
         run: |
