@@ -24,9 +24,14 @@ jobs:
 
       - name: Run code risk analysis
         run: |
-          python src/analyze_repo.py
+          python src/analyze_repo.py src
+
+      - name: Validate results (fail on high risk)
+        run: |
+          python src/ci_check.py
 
       - name: Upload analysis report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: code-risk-report
