@@ -1,65 +1,63 @@
-import ast
 import joblib
 import json
 import sys
-from pathlib import Path
-from radon.metrics import mi_visit
-from radon.complexity import cc_visit
+import os
+
+from extract_features import extract_metrics_from_file
+from heuristics import run_heuristics
 
 MODEL_PATH = "data/meta/best_model.pkl"
+THRESHOLD = 0.70
 
-def extract_features(file_path):
-    try:
-        code = Path(file_path).read_text(encoding="utf-8")
-    except:
-        return None
 
-    try:
-        tree = ast.parse(code)
-    except:
-        return None
+def predict_risk(file_path):
 
-    loc = len(code.splitlines())
-    comments = sum(1 for line in code.splitlines() if line.strip().startswith("#"))
-    functions = sum(isinstance(n, ast.FunctionDef) for n in ast.walk(tree))
-    classes = sum(isinstance(n, ast.ClassDef) for n in ast.walk(tree))
-    imports = sum(isinstance(n, (ast.Import, ast.ImportFrom)) for n in ast.walk(tree))
-    ast_nodes = sum(1 for _ in ast.walk(tree))
-    control_structures = sum(isinstance(n, (ast.If, ast.For, ast.While, ast.Try)) for n in ast.walk(tree))
-    cc = sum(block.complexity for block in cc_visit(code))
-    mi = mi_visit(code, True)
-    size_bytes = len(code.encode("utf-8"))
+    if not os.path.isfile(MODEL_PATH):
+        raise FileNotFoundError("No se encontró data/meta/best_model.pkl. Ejecuta el entrenamiento nuevamente.")
 
-    return {
-        "loc": loc,
-        "comments": comments,
-        "functions": functions,
-        "classes": classes,
-        "imports": imports,
-        "ast_nodes": ast_nodes,
-        "control_structures": control_structures,
-        "cyclomatic_complexity": cc,
-        "maintainability_index": mi,
-        "size_bytes": size_bytes
+    model = joblib.load(MODEL_PATH)
+
+    features = extract_metrics_from_file(file_path)
+    if features is None:
+        raise ValueError(f"No se pudieron extraer características del archivo {file_path}")
+
+    features["size_bytes"] = os.path.getsize(file_path)
+
+    X = [[
+        features["loc"],
+        features["comments"],
+        features["functions"],
+        features["classes"],
+        features["imports"],
+        features["ast_nodes"],
+        features["control_structures"],
+        features["cyclomatic_complexity"],
+        features["maintainability_index"],
+        features["size_bytes"]
+    ]]
+
+    proba = model.predict_proba(X)[0][1]
+    risk_flag = int(proba >= THRESHOLD)
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        code = f.read()
+    heuristics = run_heuristics(code)
+
+    result = {
+        "file": file_path,
+        "risk_probability": float(proba),
+        "risk_flag": risk_flag,
+        "heuristics": heuristics
     }
+
+    return result
 
 
 if __name__ == "__main__":
     file_path = sys.argv[1]
-    features = extract_features(file_path)
+    result = predict_risk(file_path)
 
-    if features is None:
-        print(json.dumps({"error": "No se pudo analizar el archivo"}))
-        sys.exit(1)
+    with open("analysis_single.json", "w") as f:
+        json.dump(result, f, indent=4)
 
-    model = joblib.load(MODEL_PATH)
-
-    X = [list(features.values())]
-    pred = model.predict(X)[0]
-
-    print(json.dumps({
-        "file": file_path,
-        "prediction": int(pred),
-        "risk": "ALTO" if pred == 1 else "BAJO",
-        "features": features
-    }))
+    print(json.dumps(result, indent=4))

@@ -1,47 +1,44 @@
 import json
 import sys
-from pathlib import Path
 
-REPORT_PATH = "analysis_report.json"
+THRESHOLD = 0.70
 
 def main():
-    if not Path(REPORT_PATH).exists():
-        print("ERROR: analysis_report.json no existe. ¿Falló analyze_repo.py?")
-        sys.exit(1)
-
-    with open(REPORT_PATH, "r", encoding="utf-8") as f:
+    with open("analysis_report.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    high_risk_files = []
-    heuristic_findings = []
+    high_risk = []
+    heuristic_risk = []
 
     for entry in data:
-        if entry.get("risk_ml") == 1:
-            high_risk_files.append(entry["file"])
+        file = entry["file"]
+        proba = entry.get("risk_probability", 0)
+        heuristics = entry.get("heuristics", [])
 
-        if entry.get("heuristics_detected", 0) > 0:
-            heuristic_findings.append({
-                "file": entry["file"],
-                "issues": entry["heuristics"]
-            })
+        if proba >= THRESHOLD:
+            high_risk.append((file, proba))
 
-    # Mostrar resultados
-    if high_risk_files:
-        print("❌ Archivos con riesgo ALTO por modelo ML:")
-        for f in high_risk_files:
-            print(f"   - {f}")
+        if heuristics:
+            heuristic_risk.append((file, heuristics))
 
-    if heuristic_findings:
+    print("\n=== RESULTADOS DEL ANÁLISIS DE SEGURIDAD ===\n")
+
+    if high_risk:
+        print("❌ Archivos con riesgo ALTO (probabilidad ≥ 70%):")
+        for f, p in high_risk:
+            print(f"   - {f} (probabilidad: {p:.2f})")
+
+    if heuristic_risk:
         print("\n❌ Vulnerabilidades detectadas por heurísticas:")
-        for item in heuristic_findings:
-            print(f"   - {item['file']}: {item['issues']}")
+        for f, issues in heuristic_risk:
+            print(f"   - {f}: {issues}")
 
-    # Decidir si fallar pipeline
-    if high_risk_files or heuristic_findings:
-        print("\n🚨 Pipeline fallado por riesgos encontrados.")
+    # Falla del pipeline
+    if high_risk or heuristic_risk:
+        print("\n🚨 Pipeline fallado por riesgos detectados.")
         sys.exit(1)
 
-    print("✔ No se encontraron riesgos altos. Pipeline OK.")
+    print("\n✅ No se detectaron riesgos. Pipeline exitoso.")
     sys.exit(0)
 
 
