@@ -30,7 +30,7 @@ jobs:
 
       - name: Run static analysis to generate report
         run: |
-          python src/analyze_repo.py src
+          python src/analyze_repo.py tests
 
       - name: Run CI Check
         id: cicheck
