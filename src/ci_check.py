@@ -1,44 +1,57 @@
 import json
 import sys
 
-THRESHOLD = 0.70
+THRESHOLD_PROB = 0.70
+SEVERE_LEVELS = ["HIGH", "CRITICAL"]
+
+def has_severe_heuristics(heuristics):
+    """True si alguna heurística es HIGH o CRITICAL."""
+    return any(h["severity"] in SEVERE_LEVELS for h in heuristics)
+
 
 def main():
-    with open("analysis_report.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
 
-    high_risk = []
-    heuristic_risk = []
-
-    for entry in data:
-        file = entry["file"]
-        proba = entry.get("risk_probability", 0)
-        heuristics = entry.get("heuristics", [])
-
-        if proba >= THRESHOLD:
-            high_risk.append((file, proba))
-
-        if heuristics:
-            heuristic_risk.append((file, heuristics))
-
-    print("\n=== RESULTADOS DEL ANÁLISIS DE SEGURIDAD ===\n")
-
-    if high_risk:
-        print("❌ Archivos con riesgo ALTO (probabilidad ≥ 70%):")
-        for f, p in high_risk:
-            print(f"   - {f} (probabilidad: {p:.2f})")
-
-    if heuristic_risk:
-        print("\n❌ Vulnerabilidades detectadas por heurísticas:")
-        for f, issues in heuristic_risk:
-            print(f"   - {f}: {issues}")
-
-    # Falla del pipeline
-    if high_risk or heuristic_risk:
-        print("\n🚨 Pipeline fallado por riesgos detectados.")
+    try:
+        with open("analysis_report.json", "r", encoding="utf-8") as f:
+            report = json.load(f)
+    except FileNotFoundError:
+        print("❌ No se encontró analysis_report.json. Ejecuta analyze_repo.py primero.")
         sys.exit(1)
 
-    print("\n✅ No se detectaron riesgos. Pipeline exitoso.")
+    ml_risky_files = []
+    heur_risky_files = []
+
+    for file_path, data in report.items():
+        ml_prob = data.get("ml_probability", 0)
+        heuristics = data.get("heuristics", [])
+
+        # Riesgo ML >= 70%
+        if ml_prob >= THRESHOLD_PROB:
+            ml_risky_files.append((file_path, ml_prob))
+
+        # Vulnerabilidades severas
+        if has_severe_heuristics(heuristics):
+            heur_risky_files.append((file_path, heuristics))
+
+    print("\n===== RESUMEN DE ANÁLISIS (desde analysis_report.json) =====")
+
+    if ml_risky_files:
+        print("\n🚨 Archivos con probabilidad ML ≥ 70%:")
+        for f, p in ml_risky_files:
+            print(f"  - {f}: {p:.2f}")
+
+    if heur_risky_files:
+        print("\n❌ Archivos con vulnerabilidades HIGH/CRITICAL:")
+        for f, vulns in heur_risky_files:
+            names = [v['name'] for v in vulns if v['severity'] in SEVERE_LEVELS]
+            print(f"  - {f}: {names}")
+
+    # Condición de fallo del pipeline
+    if ml_risky_files or heur_risky_files:
+        print("\n🚨 Pipeline fallado por riesgos encontrados.")
+        sys.exit(1)
+
+    print("\n✅ No se detectaron riesgos severos.")
     sys.exit(0)
 
 
