@@ -35,3 +35,11 @@ def predict_risk(filepath):
 
     proba = model.predict_proba(X)[0][1]  # probabilidad clase 1 (riesgo)
     return float(proba)
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 2:
+        print("Uso: python predict_risk.py <archivo.py>")
+    else:
+        proba = predict_risk(sys.argv[1])
+        print(f"Probabilidad de riesgo: {proba:.2f}")
