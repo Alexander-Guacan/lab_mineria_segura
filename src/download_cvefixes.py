@@ -196,8 +196,7 @@ def main():
     print(f"{'='*60}")
     print(f"\nSiguientes pasos:")
     print(f"1. Revisa el archivo: {PROCESSED_DIR / 'dataset_info.json'}")
-    print(f"2. Examina los datos filtrados: {PROCESSED_DIR / 'cvefixes_python.csv'}")
-    print(f"3. Prepárate para extraer features del código vulnerable/seguro")
+    print(f"2. Revisa el archivo de datos filtrados: {PROCESSED_DIR / 'cvefixes_python.csv'}")
 
 
 if __name__ == "__main__":
