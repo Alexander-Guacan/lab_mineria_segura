@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-def generate_html_report(json_file="multilang_security_report.json", output_file="security_report.html"):
+def generate_html_report(json_file="reports/multilang_security_report.json", output_file="reports/security_report.html"):
     """
     Genera un reporte HTML interactivo a partir del archivo JSON de seguridad.
     
@@ -605,6 +605,8 @@ def generate_html_report(json_file="multilang_security_report.json", output_file
     
     # Escribir el archivo HTML
     try:
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(html_template)
         print(f"✅ Reporte HTML generado exitosamente: '{output_file}'")

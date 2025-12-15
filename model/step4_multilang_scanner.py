@@ -29,7 +29,7 @@ class RiskKeywordCounter(BaseEstimator, TransformerMixin):
 # 2. CONFIGURACIÓN DEL ROUTER
 # ---------------------------------------------------------
 MODEL_DIR = "model/models"
-REPORT_FILE = "multilang_security_report.json"
+REPORT_FILE = "reports/multilang_security_report.json"
 
 # Mapeo: Extensión -> {Modelo, Lenguaje}
 LANG_MAP = {
@@ -189,6 +189,8 @@ def run_multilang_scan():
             full_report[filename] = result
             print(f" -> Resultado: {result['verdict']} (Score: {result['score']})")
 
+    os.makedirs(os.path.dirname(REPORT_FILE), exist_ok=True)
+    
     with open(REPORT_FILE, "w") as f:
         json.dump(full_report, f, indent=4)
     print(f"\nReporte generado: {REPORT_FILE}")
