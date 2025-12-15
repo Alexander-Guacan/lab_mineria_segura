@@ -43,3 +43,6 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+
+
+src/data/raw/
