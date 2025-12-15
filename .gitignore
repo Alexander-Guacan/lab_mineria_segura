@@ -44,5 +44,6 @@ Thumbs.db
 dist/
 build/
 
-
-src/data/raw/
+*/data/raw
+security_report.html
+*temp*
