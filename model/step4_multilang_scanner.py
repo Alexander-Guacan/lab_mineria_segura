@@ -2,6 +2,7 @@ import os
 import joblib
 import re
 import json
+import sys
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -27,8 +28,7 @@ class RiskKeywordCounter(BaseEstimator, TransformerMixin):
 # ---------------------------------------------------------
 # 2. CONFIGURACIÓN DEL ROUTER
 # ---------------------------------------------------------
-MODEL_DIR = "models"
-TEST_DIR = "../tests"
+MODEL_DIR = "model/models"
 REPORT_FILE = "multilang_security_report.json"
 
 # Mapeo: Extensión -> {Modelo, Lenguaje}
@@ -173,14 +173,15 @@ def scan_file(filepath, lang):
 def run_multilang_scan():
     print(f"--- ESCÁNER DE SEGURIDAD MULTILENGUAJE ---")
     full_report = {}
-    
-    files = os.listdir(TEST_DIR)
+
+    folder = sys.argv[1] if len(sys.argv) > 1 else "src"
+    files = os.listdir(folder)
     
     for filename in files:
         ext = os.path.splitext(filename)[1].lower()
         if ext in LANG_MAP:
             lang = LANG_MAP[ext]
-            path = os.path.join(TEST_DIR, filename)
+            path = os.path.join(folder, filename)
             
             print(f"Analizando {filename} ({lang})...")
             result = scan_file(path, lang)

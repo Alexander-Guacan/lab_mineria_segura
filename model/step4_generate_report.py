@@ -26,8 +26,8 @@ class RiskKeywordCounter(BaseEstimator, TransformerMixin):
             features.append(row)
         return np.array(features)
 
-MODEL_PATH = "models/best_model_hybrid.pkl"
-TEST_DIR = "../tests" 
+MODEL_PATH = "model/models/best_model_hybrid.pkl"
+TEST_DIR = "tests" 
 REPORT_FILE = "final_security_report.json"
 
 # --- MOTOR DE REGLAS (Scanner) ---
