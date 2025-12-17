@@ -56,7 +56,7 @@ def notify_stage_failure(stage_name):
 """
     send_message(msg.strip())
 
-def notify_scan_results(report_path):
+def notify_scan_results(report_path, report_url):
     if not os.path.exists(report_path):
         send_message("⚠️ No se encontró el reporte de seguridad.")
         return
@@ -83,6 +83,9 @@ def notify_scan_results(report_path):
 🟠 *HIGH:* {high}
 🟡 *MEDIUM:* {medium}
 
+📄 Reporte completo:
+{report_url}
+
 📌 El pipeline continuará según la política definida.
 """
     send_message(msg.strip())
@@ -99,7 +102,7 @@ def main():
         print("  python notify_telegram.py stage_start <nombre_etapa>")
         print("  python notify_telegram.py stage_success <nombre_etapa>")
         print("  python notify_telegram.py stage_fail <nombre_etapa>")
-        print("  python notify_telegram.py scan_result <ruta_reporte>")
+        print("  python notify_telegram.py scan_result <ruta_reporte> <url_reporte>")
         print("  python notify_telegram.py custom <mensaje>")
         sys.exit(1)
 
@@ -115,7 +118,7 @@ def main():
         notify_stage_failure(sys.argv[2])
 
     elif action == "scan_result":
-        notify_scan_results(sys.argv[2])
+        notify_scan_results(sys.argv[2], sys.argv[3])
 
     elif action == "custom":
         notify_custom(" ".join(sys.argv[2:]))
