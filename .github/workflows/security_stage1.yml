@@ -1,0 +1,141 @@
+name: Stage 1 - Security Analysis (ML + Heuristics)
+
+on:
+  pull_request:
+    branches:
+      - test
+    types: [opened, synchronize, reopened]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+    # -------------------------------------------------
+    # 1. Checkout
+    # -------------------------------------------------
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # -------------------------------------------------
+    # 2. Setup Python
+    # -------------------------------------------------
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # -------------------------------------------------
+    # 3. Install dependencies
+    # -------------------------------------------------
+    - name: Install dependencies
+      run: |
+        pip install -r model/requirements.txt
+
+    # -------------------------------------------------
+    # 4. Notify Telegram - Start
+    # -------------------------------------------------
+    - name: Notify start of analysis
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python model/notify_telegram.py stage_start "Etapa 1 - Análisis de Seguridad"
+
+    # -------------------------------------------------
+    # 5. Get changed files (dev -> test)
+    # -------------------------------------------------
+    - name: Get changed files
+      run: |
+        git fetch origin ${{ github.base_ref }}
+        git diff --name-only origin/${{ github.base_ref }} > changed_files.txt
+        grep "^src/" changed_files.txt || true
+
+    # -------------------------------------------------
+    # 6. Run security scanner (ML + Heuristics)
+    # -------------------------------------------------
+    - name: Run security scanner
+      run: |
+        python model/scanner.py changed_files.txt
+
+    # -------------------------------------------------
+    # 7. Notify scan results
+    # -------------------------------------------------
+    - name: Notify scan results
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python model/notify_telegram.py scan_result reports/security_report.json
+
+    # -------------------------------------------------
+    # 8. Fail pipeline if HIGH or CRITICAL
+    # -------------------------------------------------
+    - name: Enforce security policy
+      id: policy
+      run: |
+        python - << 'EOF'
+        import json, sys
+
+        with open("reports/security_report.json") as f:
+            report = json.load(f)
+
+        for file, data in report.items():
+            if data["verdict"] in ["HIGH", "CRITICAL"]:
+                print(f"❌ Vulnerabilidad detectada en {file}: {data['verdict']}")
+                sys.exit(1)
+
+        print("✅ Código seguro")
+        EOF
+
+    # -------------------------------------------------
+    # 9. Notify success
+    # -------------------------------------------------
+    - name: Notify success
+      if: success()
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python model/notify_telegram.py stage_success "Etapa 1 - Análisis de Seguridad"
+
+    # -------------------------------------------------
+    # 10. Create Issue if failed
+    # -------------------------------------------------
+    - name: Create security issue
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: "🚨 Vulnerabilidades detectadas - Fixing required",
+            body: `
+            Se detectaron vulnerabilidades **HIGH o CRITICAL** durante la Etapa 1 del pipeline.
+
+            📌 Pull Request: #${context.payload.pull_request.number}
+            📄 Revisa el reporte de seguridad generado.
+
+            ❗ El merge ha sido bloqueado automáticamente.
+            `,
+            labels: ["fixing required"]
+          })
+
+    # -------------------------------------------------
+    # 11. Notify failure
+    # -------------------------------------------------
+    - name: Notify failure
+      if: failure()
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python model/notify_telegram.py stage_fail "Etapa 1 - Análisis de Seguridad"
