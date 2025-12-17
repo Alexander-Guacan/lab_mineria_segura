@@ -35,9 +35,10 @@ jobs:
     # -------------------------------------------------
     # 3. Install dependencies
     # -------------------------------------------------
-    - name: Install dependencies
+    - name: Install minimal dependencies for pipeline
       run: |
-        pip install -r model/requirements.txt
+        python -m pip install --upgrade pip
+        pip install numpy scikit-learn joblib requests
 
     # -------------------------------------------------
     # 4. Notify Telegram - Start
