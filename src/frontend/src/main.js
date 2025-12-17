@@ -59,5 +59,4 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// Cargar notas al iniciar
 loadNotes();
