@@ -56,8 +56,8 @@ jobs:
     - name: Get changed files
       run: |
         git fetch origin ${{ github.base_ref }}
-        git diff --name-only origin/${{ github.base_ref }} > changed_files.txt
-        grep "^src/" changed_files.txt || true
+        git diff --name-only origin/${{ github.base_ref }} \
+        | grep "^src/" > changed_files.txt || true
 
     # -------------------------------------------------
     # 6. Run security scanner (ML + Heuristics)
@@ -139,6 +139,7 @@ jobs:
             Se detectaron vulnerabilidades **HIGH o CRITICAL** durante la Etapa 1 del pipeline.
 
             📌 Pull Request: #${context.payload.pull_request.number}
+            👤 Autor: @${context.payload.pull_request.user.login}
             📄 **Reporte completo (HTML + JSON):**
             https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
