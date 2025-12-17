@@ -67,17 +67,33 @@ jobs:
         python model/scanner.py changed_files.txt
 
     # -------------------------------------------------
-    # 7. Notify scan results
+    # 7. Generate HTML security report
+    # -------------------------------------------------
+    - name: Generate HTML security report
+      run: |
+        python model/generate_report.py reports/security_report.json
+
+    # -------------------------------------------------
+    # 8. Upload security report (HTML)
+    # -------------------------------------------------
+    - name: Upload security report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report
+        path: reports/
+
+    # -------------------------------------------------
+    # 9. Notify scan results
     # -------------------------------------------------
     - name: Notify scan results
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: |
-        python model/notify_telegram.py scan_result reports/security_report.json
+        python model/notify_telegram.py scan_result reports/security_report.json "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
     # -------------------------------------------------
-    # 8. Fail pipeline if HIGH or CRITICAL
+    # 10. Fail pipeline if HIGH or CRITICAL
     # -------------------------------------------------
     - name: Enforce security policy
       id: policy
@@ -97,7 +113,7 @@ jobs:
         EOF
 
     # -------------------------------------------------
-    # 9. Notify success
+    # 11. Notify success
     # -------------------------------------------------
     - name: Notify success
       if: success()
@@ -108,7 +124,7 @@ jobs:
         python model/notify_telegram.py stage_success "Etapa 1 - Análisis de Seguridad"
 
     # -------------------------------------------------
-    # 10. Create Issue if failed
+    # 12. Create Issue if failed
     # -------------------------------------------------
     - name: Create security issue
       if: failure()
@@ -123,7 +139,8 @@ jobs:
             Se detectaron vulnerabilidades **HIGH o CRITICAL** durante la Etapa 1 del pipeline.
 
             📌 Pull Request: #${context.payload.pull_request.number}
-            📄 Revisa el reporte de seguridad generado.
+            📄 **Reporte completo (HTML + JSON):**
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ❗ El merge ha sido bloqueado automáticamente.
             `,
@@ -131,7 +148,7 @@ jobs:
           })
 
     # -------------------------------------------------
-    # 11. Notify failure
+    # 13. Notify failure
     # -------------------------------------------------
     - name: Notify failure
       if: failure()
