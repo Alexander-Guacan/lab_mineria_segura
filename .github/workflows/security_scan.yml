@@ -1,4 +1,4 @@
-name: Stage 1 - Security Analysis (ML + Heuristics)
+name: Security Analysis (ML + Heuristics)
 
 on:
   pull_request:
@@ -219,7 +219,7 @@ jobs:
     - name: Run backend tests
       working-directory: src/backend
       run: |
-        pytest
+        python -m pytest
       continue-on-error: true
       id: backend_tests
 
