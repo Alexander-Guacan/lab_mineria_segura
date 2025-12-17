@@ -1,7 +1,7 @@
 import { fetchNotes } from "./api";
 
-const form = document.getElementById("noteForm");
-const notesDiv = document.getElementById("notes");
+const form = document.querySelector("#noteForm");
+const notesDiv = document.querySelector("#notes");
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -53,8 +53,8 @@ async function loadNotes() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const title = document.getElementById("title").value;
-  const content = document.getElementById("content").value;
+  const title = document.querySelector("#title").value;
+  const content = document.querySelector("#content").value;
 
   try {
     const res = await fetch(`${API_URL}/notes`, {
