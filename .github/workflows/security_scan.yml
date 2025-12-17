@@ -169,6 +169,9 @@ jobs:
       issues: write
       pull-requests: write
 
+    outputs:
+    tests_passed: ${{ steps.test_result.outputs.tests_passed }}
+
     steps:
     # -------------------------------------------------
     # 1. Checkout repository
@@ -249,9 +252,9 @@ jobs:
       id: test_result
       run: |
         if [[ "${{ steps.backend_tests.outcome }}" == "failure" || "${{ steps.frontend_tests.outcome }}" == "failure" ]]; then
-          echo "FAILED=true" >> $GITHUB_ENV
+          echo "tests_passed=false" >> $GITHUB_OUTPUT
         else
-          echo "FAILED=false" >> $GITHUB_ENV
+          echo "tests_passed=true" >> $GITHUB_OUTPUT
         fi
 
     # -------------------------------------------------
