@@ -23,7 +23,8 @@ def send_message(text):
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
-        "parse_mode": "Markdown"
+        "parse_mode": "HTML",
+        "disable_web_page_preview": False
     }
     r = requests.post(TELEGRAM_API, json=payload)
     if r.status_code != 200:
@@ -34,24 +35,24 @@ def send_message(text):
 # ---------------------------------------------------------
 def notify_stage_start(stage_name):
     msg = f"""
-🚀 *Inicio de Pipeline*
-📌 *Etapa:* {stage_name}
+🚀 <b>Inicio de Pipeline</b>
+📌 <b>Etapa:</b> {stage_name}
 🕒 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
     send_message(msg.strip())
 
 def notify_stage_success(stage_name):
     msg = f"""
-✅ *Etapa completada*
-📌 *Etapa:* {stage_name}
+✅ <b>Etapa completada</b>
+📌 <b>Etapa:</b> {stage_name}
 🕒 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
     send_message(msg.strip())
 
 def notify_stage_failure(stage_name):
     msg = f"""
-❌ *Fallo en Pipeline*
-📌 *Etapa:* {stage_name}
+❌ <b>Fallo en Pipeline</b>
+📌 <b>Etapa:</b> {stage_name}
 🕒 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
     send_message(msg.strip())
@@ -76,15 +77,15 @@ def notify_scan_results(report_path, report_url):
             medium += 1
 
     msg = f"""
-🛡️ *Resultado de Análisis de Seguridad*
+🛡️ <b>Resultado de Análisis de Seguridad</b>
 📄 Archivos analizados: {total}
 
-🔴 *CRITICAL:* {critical}
-🟠 *HIGH:* {high}
-🟡 *MEDIUM:* {medium}
+🔴 <b>CRITICAL:</b> {critical}
+🟠 <b>HIGH:</b> {high}
+🟡 <b>MEDIUM:</b> {medium}
 
-📄 Reporte completo:
-{report_url}
+📄 <b>Reporte completo:</b>
+<a href="{report_url}">{report_url}</a>
 
 📌 El pipeline continuará según la política definida.
 """
