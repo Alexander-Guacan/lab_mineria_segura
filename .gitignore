@@ -28,7 +28,6 @@ data/meta/dataset_raw.csv
 data/meta/dataset_features.csv
 data/temp/
 *.csv
-*.json
 *.pickle
 *.db
 
@@ -50,4 +49,3 @@ security_report.html
 *temp*
 
 *.env
-*.txt
