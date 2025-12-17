@@ -24,10 +24,6 @@ class Note(BaseModel):
 
 notes = []
 
-@app.get("/")
-def root():
-    return {"status": "ok"}
-
 @app.get("/notes")
 def get_notes():
     return notes
