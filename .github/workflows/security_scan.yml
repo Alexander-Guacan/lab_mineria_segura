@@ -192,7 +192,7 @@ jobs:
     - name: Install Python dependencies for notifications and tests
       run: |
         python -m pip install --upgrade pip
-        pip install requests fastapi pytest httpx
+        pip install requests fastapi pytest httpx dotenv
 
     # -------------------------------------------------
     # 4. Notify Telegram - Stage 2 start
