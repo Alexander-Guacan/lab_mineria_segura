@@ -187,7 +187,15 @@ jobs:
         python-version: "3.10"
 
     # -------------------------------------------------
-    # 3. Notify Telegram - Stage 2 start
+    # 3. Install minimal Python dependencies
+    # -------------------------------------------------
+    - name: Install Python dependencies for notifications and tests
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests fastapi pytest httpx
+
+    # -------------------------------------------------
+    # 4. Notify Telegram - Stage 2 start
     # -------------------------------------------------
     - name: Notify start of Stage 2
       env:
@@ -197,7 +205,7 @@ jobs:
         python model/notify_telegram.py stage_start "Etapa 2 - Merge automático y pruebas"
 
     # -------------------------------------------------
-    # 4. Auto-merge dev -> test
+    # 5. Auto-merge dev -> test
     # -------------------------------------------------
     - name: Auto merge dev into test
       run: |
@@ -206,19 +214,12 @@ jobs:
         git push origin test
 
     # -------------------------------------------------
-    # 5. Install backend test dependencies
-    # -------------------------------------------------
-    - name: Install backend dependencies
-      run: |
-        pip install fastapi pytest httpx
-
-    # -------------------------------------------------
     # 6. Run backend tests
     # -------------------------------------------------
     - name: Run backend tests
       working-directory: src/backend
       run: |
-        python -m pytest
+        pytest
       continue-on-error: true
       id: backend_tests
 
