@@ -28,6 +28,10 @@ notes = []
 def root():
     return {"status": "ok"}
 
+@app.get('/greeting')
+def greeting():
+    return "Hello world"
+
 @app.get("/notes")
 def get_notes():
     return notes
