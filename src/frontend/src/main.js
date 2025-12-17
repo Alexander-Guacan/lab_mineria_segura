@@ -5,28 +5,47 @@ const notesDiv = document.getElementById("notes");
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+function clearNotes() {
+  notesDiv.textContent = "";
+}
+
+function renderMessage(message) {
+  clearNotes();
+  const p = document.createElement("p");
+  p.textContent = message;
+  notesDiv.append(p);
+}
+
+function renderNote(note) {
+  const noteDiv = document.createElement("div");
+  noteDiv.classList.add("note");
+
+  const title = document.createElement("h3");
+  title.textContent = note.title;
+
+  const content = document.createElement("p");
+  content.textContent = note.content;
+
+  noteDiv.append(title, content);
+  notesDiv.append(noteDiv);
+}
+
 async function loadNotes() {
-  notesDiv.innerHTML = "⏳ Cargando notas...";
+  renderMessage("⏳ Cargando notas...");
+
   try {
     const data = await fetchNotes();
 
     if (data.length === 0) {
-      notesDiv.innerHTML = "<p>No hay notas aún.</p>";
+      renderMessage("No hay notas aún.");
       return;
     }
 
-    notesDiv.innerHTML = data
-      .map(
-        (note) => `
-        <div class="note">
-          <h3>${note.title}</h3>
-          <p>${note.content}</p>
-        </div>
-      `
-      )
-      .join("");
+    clearNotes();
+    data.forEach(renderNote);
+
   } catch (err) {
-    notesDiv.innerHTML = "❌ Error cargando notas";
+    renderMessage("❌ Error cargando notas");
     console.error(err);
   }
 }
@@ -53,6 +72,7 @@ form.addEventListener("submit", async (e) => {
 
     form.reset();
     loadNotes();
+
   } catch (err) {
     alert("❌ Error conectando con el backend");
     console.error(err);
