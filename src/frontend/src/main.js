@@ -1,13 +1,14 @@
+import { fetchNotes } from "./api";
+
 const form = document.getElementById("noteForm");
 const notesDiv = document.getElementById("notes");
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-async function fetchNotes() {
+async function loadNotes() {
   notesDiv.innerHTML = "⏳ Cargando notas...";
   try {
-    const res = await fetch(`${API_URL}/notes`);
-    const data = await res.json();
+    const data = await fetchNotes();
 
     if (data.length === 0) {
       notesDiv.innerHTML = "<p>No hay notas aún.</p>";
@@ -51,7 +52,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     form.reset();
-    fetchNotes();
+    loadNotes();
   } catch (err) {
     alert("❌ Error conectando con el backend");
     console.error(err);
@@ -59,4 +60,4 @@ form.addEventListener("submit", async (e) => {
 });
 
 // Cargar notas al iniciar
-fetchNotes();
+loadNotes();
