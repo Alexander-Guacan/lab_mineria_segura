@@ -170,7 +170,7 @@ jobs:
       pull-requests: write
 
     outputs:
-    tests_passed: ${{ steps.test_result.outputs.tests_passed }}
+      tests_passed: ${{ steps.test_result.outputs.tests_passed }}
 
     steps:
     # -------------------------------------------------

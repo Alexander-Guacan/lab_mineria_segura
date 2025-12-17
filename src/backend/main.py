@@ -30,7 +30,7 @@ def get_notes():
 
 @app.post("/notes")
 def add_note(note: Note):
-    if len(notes) > 50:
+    if len(notes) > 25:
         notes.clear()
 
     notes.append(note)
