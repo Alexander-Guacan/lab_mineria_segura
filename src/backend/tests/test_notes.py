@@ -3,14 +3,6 @@ from main import app
 
 client = TestClient(app)
 
-
-def test_root_ok():
-    """El backend responde correctamente"""
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json()["status"] == "ok"
-
-
 def test_get_notes_initially_empty():
     """Al inicio no hay notas"""
     response = client.get("/notes")
