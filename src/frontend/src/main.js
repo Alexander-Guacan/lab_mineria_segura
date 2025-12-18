@@ -17,8 +17,8 @@ function renderMessage(message) {
 }
 
 function renderNote(note) {
-  const noteDiv = document.createElement("div");
-  noteDiv.classList.add("note");
+  const noteArticle = document.createElement("article");
+  noteArticle.classList.add("note");
 
   const title = document.createElement("h3");
   title.textContent = note.title;
@@ -26,8 +26,8 @@ function renderNote(note) {
   const content = document.createElement("p");
   content.textContent = note.content;
 
-  noteDiv.append(title, content);
-  notesDiv.append(noteDiv);
+  noteArticle.append(title, content);
+  notesDiv.append(noteArticle);
 }
 
 async function loadNotes() {
