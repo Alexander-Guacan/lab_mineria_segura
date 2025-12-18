@@ -208,7 +208,15 @@ jobs:
         python model/notify_telegram.py stage_start "Etapa 2 - Merge automático y pruebas"
 
     # -------------------------------------------------
-    # 5. Auto-merge dev -> test
+    # 5. Configure Git identity
+    # -------------------------------------------------
+    - name: Configure Git identity
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    # -------------------------------------------------
+    # 65. Auto-merge dev -> test
     # -------------------------------------------------
     - name: Auto merge dev into test
       run: |
@@ -217,7 +225,7 @@ jobs:
         git push origin test
 
     # -------------------------------------------------
-    # 6. Run backend tests
+    # 7. Run backend tests
     # -------------------------------------------------
     - name: Run backend tests
       working-directory: src/backend
@@ -227,7 +235,7 @@ jobs:
       id: backend_tests
 
     # -------------------------------------------------
-    # 7. Setup Node.js
+    # 8. Setup Node.js
     # -------------------------------------------------
     - name: Setup Node
       uses: actions/setup-node@v4
@@ -235,7 +243,7 @@ jobs:
         node-version: "20"
 
     # -------------------------------------------------
-    # 8. Run frontend tests
+    # 9. Run frontend tests
     # -------------------------------------------------
     - name: Run frontend tests
       working-directory: src/frontend
@@ -246,7 +254,7 @@ jobs:
       id: frontend_tests
 
     # -------------------------------------------------
-    # 9. Evaluate test results
+    # 10. Evaluate test results
     # -------------------------------------------------
     - name: Evaluate test results
       id: test_result
@@ -258,7 +266,7 @@ jobs:
         fi
 
     # -------------------------------------------------
-    # 10. Create Issue if tests failed
+    # 11. Create Issue if tests failed
     # -------------------------------------------------
     - name: Create issue on test failure
       if: env.FAILED == 'true'
@@ -282,7 +290,7 @@ jobs:
           })
 
     # -------------------------------------------------
-    # 11. Notify Telegram - failure
+    # 12. Notify Telegram - failure
     # -------------------------------------------------
     - name: Notify test failure
       if: env.FAILED == 'true'
@@ -293,7 +301,7 @@ jobs:
         python model/notify_telegram.py stage_fail "Etapa 2 - Fallaron las pruebas"
 
     # -------------------------------------------------
-    # 12. Notify Telegram - success
+    # 13. Notify Telegram - success
     # -------------------------------------------------
     - name: Notify Stage 2 success
       if: env.FAILED == 'false'
