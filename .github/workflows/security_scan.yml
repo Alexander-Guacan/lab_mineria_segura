@@ -266,10 +266,24 @@ jobs:
         fi
 
     # -------------------------------------------------
-    # 11. Create Issue if tests failed
+    # 11. Notify Telegram - Test results
+    # -------------------------------------------------
+    - name: Notify test results
+      env:
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        if [[ "${{ steps.test_result.outputs.tests_passed }}" == "true" ]]; then
+          python model/notify_telegram.py info "✅ Tests backend y frontend ejecutados correctamente"
+        else
+          python model/notify_telegram.py warning "⚠️ Fallaron uno o más tests (backend/frontend)"
+        fi
+
+    # -------------------------------------------------
+    # 12. Create issue on test failure
     # -------------------------------------------------
     - name: Create issue on test failure
-      if: env.FAILED == 'true'
+      if: steps.test_result.outputs.tests_passed == 'false'
       uses: actions/github-script@v7
       with:
         script: |
@@ -290,10 +304,10 @@ jobs:
           })
 
     # -------------------------------------------------
-    # 12. Notify Telegram - failure
+    # 13. Notify Telegram - Stage 2 failure
     # -------------------------------------------------
     - name: Notify test failure
-      if: env.FAILED == 'true'
+      if: steps.test_result.outputs.tests_passed == 'false'
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -301,10 +315,10 @@ jobs:
         python model/notify_telegram.py stage_fail "Etapa 2 - Fallaron las pruebas"
 
     # -------------------------------------------------
-    # 13. Notify Telegram - success
+    # 14. Notify Telegram - Stage 2 success
     # -------------------------------------------------
     - name: Notify Stage 2 success
-      if: env.FAILED == 'false'
+      if: steps.test_result.outputs.tests_passed == 'true'
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
