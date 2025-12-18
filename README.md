@@ -1,8 +1,9 @@
-# Laboratorio 1 – Minería de Datos Aplicada al Desarrollo de Software Seguro  
+# Desarrollo e Implementación de un Pipeline CI/CD Seguro con integración de IA para la Detección Automática de Vulnerabilidades en código fuente mediante un Modelo de Minería de Datos.
 ### Universidad de las Fuerzas Armadas ESPE  
 **Materia:** Desarrollo de Software Seguro  
-**Estudiante:** *[Tu nombre]*  
-**Fecha límite:** 2 de diciembre de 2025  
+**Estudiantes:** Alexander Guacán, Ariel Guevara  
+**NRC:** 27894  
+**Deploy:** [Sistema de Notas](https://lab-mineria-segura.vercel.app/)
 
 ---
 
@@ -700,6 +701,13 @@ RESULTADO DE LA PREDICCIÓN
   pip install -r requirements.txt
   ```
 - Los resultados del modelo se guardan en la carpeta `data/results/`.
+
+
+### Anexos
+
+#### Chatbot de Telegram
+
+![telegram-bot](./docs/images/bot_telegram.png)
 
 ## 📄 Licencia
 
