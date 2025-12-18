@@ -36,8 +36,3 @@ def add_note(note: Note):
     notes.append(note)
     return {"message": "Note added"}
 
-@app.get("/ping")
-def ping(host: str):
-    # ❌ Command Injection
-    cmd = f"ping -c 1 {host}"
-    return os.popen(cmd).read()
