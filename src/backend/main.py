@@ -35,3 +35,4 @@ def add_note(note: Note):
 
     notes.append(note)
     return {"message": "Note added"}
+
