@@ -80,9 +80,3 @@ form.addEventListener("submit", async (e) => {
 });
 
 loadNotes();
-
-const params = new URLSearchParams(window.location.search);
-const name = params.get("name");
-
-// ❌ XSS
-document.getElementById("output").innerHTML = "Hola " + name;
