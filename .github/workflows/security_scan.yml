@@ -274,9 +274,9 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: |
         if [[ "${{ steps.test_result.outputs.tests_passed }}" == "true" ]]; then
-          python model/notify_telegram.py info "✅ Tests backend y frontend ejecutados correctamente"
+          python model/notify_telegram.py stage_success "Tests backend y frontend ejecutados correctamente"
         else
-          python model/notify_telegram.py warning "⚠️ Fallaron uno o más tests (backend/frontend)"
+          python model/notify_telegram.py stage_fail "Fallaron uno o más tests (backend/frontend)"
         fi
 
     # -------------------------------------------------
