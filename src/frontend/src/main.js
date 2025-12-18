@@ -1,6 +1,6 @@
 import { fetchNotes } from "./api";
 
-const form = document.querySelector("#noteForm");
+const form = document.querySelector("#note-form");
 const notesDiv = document.querySelector("#notes");
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
